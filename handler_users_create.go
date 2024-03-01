@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -15,13 +14,6 @@ func (c *apiConfig) usersCreateHandler(w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Name string
 	}
-	type User struct {
-		ID string 
-		Name string
-		CreatedAt time.Time
-		UpdatedAt time.Time
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	reqBody := requestBody{}
 	err := decoder.Decode(&reqBody)
@@ -30,29 +22,17 @@ func (c *apiConfig) usersCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := User{
-		ID: uuid.New().String(),
-		Name: reqBody.Name,
+	user, err := c.DB.CreateUser(r.Context(), database.CreateUserParams{
+		ID: uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-	}
-
-	if _, err = c.DB.CreateUser(r.Context(), database.CreateUserParams{
-		ID: user.ID,
-		Name: user.Name,
-		CreatedAt: sql.NullTime{
-			Time: user.CreatedAt,
-			Valid: true,
-		},
-		UpdatedAt: sql.NullTime{
-			Time: user.CreatedAt,
-			Valid: true,
-		},
-	}); err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Failed to create User")
+		Name: reqBody.Name,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error: create user failed")
 		return
 	}
 
-	respondWithJson(w, http.StatusOK, user)
+	respondWithJson(w, http.StatusOK, databaseUserToUser(user))
 }
 
