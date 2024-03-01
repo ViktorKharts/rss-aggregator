@@ -1,8 +1,7 @@
 package main
 
-import _ "github.com/lib/pq"
-
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,16 +11,34 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"github.com/ViktorKharts/rss-aggregator/internal/database"
 )
 
 const (
 	SERVER_PORT="PORT"
+	DATABASE="postgres"
+	DB_CONNECTION="DB_CONNECTION"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Failed to load environment variables")
+	}
+
+	dbUrl := os.Getenv(DB_CONNECTION)
+	db, err := sql.Open(DATABASE, dbUrl)
+	if err != nil {
+		log.Fatal("Failed to get DB connection")
+	}
+
+	cfg := apiConfig{
+		DB: database.New(db), 
 	}
 
 	r := chi.NewRouter()
