@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/ViktorKharts/rss-aggregator/internal/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/ViktorKharts/rss-aggregator/internal/database"
 )
 
 const (
@@ -51,6 +51,9 @@ func main() {
 	v1 := chi.NewRouter()
 	v1.Get("/readiness", readinessHandler)
 	v1.Get("/err", errorHandler)
+
+	// users
+	v1.Post("/users", cfg.usersCreateHandler)
 
 	r.Mount("/v1", v1)
 
