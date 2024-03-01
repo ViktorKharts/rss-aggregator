@@ -1,20 +1,29 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/ViktorKharts/rss-aggregator/internal/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 const (
 	SERVER_PORT="PORT"
+	DATABASE="postgres"
+	DB_CONNECTION="DB_CONNECTION"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	err := godotenv.Load()
@@ -22,16 +31,32 @@ func main() {
 		log.Fatal("Failed to load environment variables")
 	}
 
+	dbUrl := os.Getenv(DB_CONNECTION)
+	db, err := sql.Open(DATABASE, dbUrl)
+	if err != nil {
+		log.Fatal("Failed to get DB connection")
+	}
+
+	cfg := apiConfig{
+		DB: database.New(db), 
+	}
+
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"https://*", "http://*"},
 		AllowedHeaders: []string{"*"},
+		ExposedHeaders: []string{"Link"},
 		AllowedMethods: []string{"HEAD","GET","PUT","POST","DELETE","OPTIONS"},
+		AllowCredentials: false,
+		MaxAge: 300,
 	}))
 
 	v1 := chi.NewRouter()
 	v1.Get("/readiness", readinessHandler)
 	v1.Get("/err", errorHandler)
+
+	// users
+	v1.Post("/users", cfg.usersCreateHandler)
 
 	r.Mount("/v1", v1)
 
