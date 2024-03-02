@@ -56,6 +56,7 @@ func main() {
 	v1.Get("/err", errorHandler)
 
 	// users
+	v1.Get("/users", cfg.usersGetHandler)
 	v1.Post("/users", cfg.usersCreateHandler)
 
 	r.Mount("/v1", v1)
