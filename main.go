@@ -61,6 +61,7 @@ func main() {
 
 	// feeds
 	v1.Post("/feeds", cfg.middlewareAuth(cfg.feedsCreateHandler))
+	v1.Get("/feeds", cfg.feedsGetHandler)
 
 	r.Mount("/v1", v1)
 
