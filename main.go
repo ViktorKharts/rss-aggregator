@@ -56,8 +56,11 @@ func main() {
 	v1.Get("/err", errorHandler)
 
 	// users
-	v1.Get("/users", cfg.usersGetHandler)
+	v1.Get("/users",  cfg.middlewareAuth(cfg.usersGetHandler))
 	v1.Post("/users", cfg.usersCreateHandler)
+
+	// feeds
+	v1.Post("/feeds", cfg.middlewareAuth(cfg.feedsCreateHandler))
 
 	r.Mount("/v1", v1)
 
