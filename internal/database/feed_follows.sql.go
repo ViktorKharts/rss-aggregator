@@ -66,10 +66,10 @@ func (q *Queries) GetFeedFollowsByUser(ctx context.Context, userID uuid.UUID) (F
 
 const removeFeedFollow = `-- name: RemoveFeedFollow :exec
 DELETE FROM feed_follows
-WHERE feed_id = $1
+WHERE id = $1
 `
 
-func (q *Queries) RemoveFeedFollow(ctx context.Context, feedID uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, removeFeedFollow, feedID)
+func (q *Queries) RemoveFeedFollow(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, removeFeedFollow, id)
 	return err
 }

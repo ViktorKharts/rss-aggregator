@@ -10,5 +10,5 @@ WHERE user_id = $1;
 
 -- name: RemoveFeedFollow :exec
 DELETE FROM feed_follows
-WHERE feed_id = $1;
+WHERE id = $1;
 

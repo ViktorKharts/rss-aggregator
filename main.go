@@ -66,7 +66,7 @@ func main() {
 	// feed follows
 	v1.Get("/feed_follows", cfg.middlewareAuth(cfg.feedFollowsGetHandler))
 	v1.Post("/feed_follows", cfg.middlewareAuth(cfg.feedFollowsCreateHandler))
-	//v1.Delete("feed_follows/{feedFollowsID}", cfg.feedFollowsDeleteHandler)
+	v1.Delete("/feed_follows/{feedFollowsID}", cfg.feedFollowsDeleteHandler)
 
 	r.Mount("/v1", v1)
 
