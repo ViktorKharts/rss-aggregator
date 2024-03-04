@@ -9,7 +9,7 @@ import (
 func (c *apiConfig) feedFollowsGetHandler(w http.ResponseWriter, r *http.Request, u database.User) {
 	ff, err := c.DB.GetFeedFollowsByUser(r.Context(), u.ID)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Failed to fetch feed follows")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
