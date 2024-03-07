@@ -8,10 +8,12 @@ SELECT * FROM feeds;
 
 -- name: GetFeedsByLastFetchedAt :many
 SELECT * FROM feeds
-ORDER BY last_fetched_at DESC;
+ORDER BY last_fetched_at DESC
+LIMIT $1;
 
--- name: UpdateFeedLastFetchedAt :exec
+-- name: UpdateFeedLastFetchedAt :many 
 UPDATE feeds
-SET updated_at = $2, last_fetched_at = $2 
-WHERE id = $1;
+SET updated_at = NOW(), last_fetched_at = NOW() 
+WHERE id = $1
+RETURNING *;
 
