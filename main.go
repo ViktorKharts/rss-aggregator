@@ -75,7 +75,7 @@ func main() {
 		Addr: fmt.Sprintf(":%s", PORT),
 		Handler: r,
 	}
-
+	fetchDataFromFeed("https://wagslane.dev/index.xml")
 	fmt.Printf("\nServer has started on PORT:%s\n", PORT)
 	log.Fatal(server.ListenAndServe())
 }
