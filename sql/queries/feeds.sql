@@ -6,3 +6,14 @@ RETURNING *;
 -- name: GetFeeds :many
 SELECT * FROM feeds;
 
+-- name: GetFeedsByLastFetchedAt :many
+SELECT * FROM feeds
+ORDER BY last_fetched_at DESC
+LIMIT $1;
+
+-- name: UpdateFeedLastFetchedAt :many 
+UPDATE feeds
+SET updated_at = NOW(), last_fetched_at = NOW() 
+WHERE id = $1
+RETURNING *;
+

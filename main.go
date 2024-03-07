@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ViktorKharts/rss-aggregator/internal/database"
 	"github.com/go-chi/chi/v5"
@@ -37,8 +38,10 @@ func main() {
 		log.Fatal("Failed to get DB connection")
 	}
 
+	dbQueries := database.New(db)
+
 	cfg := apiConfig{
-		DB: database.New(db), 
+		DB: dbQueries, 
 	}
 
 	r := chi.NewRouter()
@@ -76,6 +79,9 @@ func main() {
 		Handler: r,
 	}
 
+	go startScraping(dbQueries, 10, time.Minute)
+
+	fetchDataFromFeed("https://wagslane.dev/index.xml")
 	fmt.Printf("\nServer has started on PORT:%s\n", PORT)
 	log.Fatal(server.ListenAndServe())
 }
