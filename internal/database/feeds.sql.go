@@ -119,3 +119,19 @@ func (q *Queries) GetFeedsByLastFetchedAt(ctx context.Context) ([]Feed, error) {
 	}
 	return items, nil
 }
+
+const updateFeedLastFetchedAt = `-- name: UpdateFeedLastFetchedAt :exec
+UPDATE feeds
+SET updated_at = $2, last_fetched_at = $2 
+WHERE id = $1
+`
+
+type UpdateFeedLastFetchedAtParams struct {
+	ID        uuid.UUID
+	UpdatedAt time.Time
+}
+
+func (q *Queries) UpdateFeedLastFetchedAt(ctx context.Context, arg UpdateFeedLastFetchedAtParams) error {
+	_, err := q.db.ExecContext(ctx, updateFeedLastFetchedAt, arg.ID, arg.UpdatedAt)
+	return err
+}
