@@ -71,6 +71,9 @@ func main() {
 	v1.Post("/feed_follows", cfg.middlewareAuth(cfg.feedFollowsCreateHandler))
 	v1.Delete("/feed_follows/{feedFollowsID}", cfg.feedFollowsDeleteHandler)
 
+	// posts
+	v1.Get("/posts", cfg.middlewareAuth(cfg.postsGetHandler))
+
 	r.Mount("/v1", v1)
 
 	PORT := os.Getenv(SERVER_PORT)
