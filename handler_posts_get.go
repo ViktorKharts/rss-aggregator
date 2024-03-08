@@ -5,12 +5,12 @@ import (
 	"strconv"
 
 	"github.com/ViktorKharts/rss-aggregator/internal/database"
-	"github.com/go-chi/chi/v5"
 )
 
-func (c *apiConfig) postsGetHandler(w http.ResponseWriter, r *http.Request, u database.User) {
-	l := chi.URLParam(r, "limit")	
-	lInt, err := strconv.Atoi(l)
+const defaultLimitValue = 10
+
+func (c *apiConfig) postsGetHandler(w http.ResponseWriter, r *http.Request, u database.User){
+	l, err := getLimit(r.URL.Query().Get("limit"))	
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -18,7 +18,7 @@ func (c *apiConfig) postsGetHandler(w http.ResponseWriter, r *http.Request, u da
 
 	posts, err := c.DB.GetPostsByUser(r.Context(), database.GetPostsByUserParams{
 		UserID: u.ID,
-		Limit: int32(lInt),
+		Limit: l,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Failed to fetch posts")
@@ -27,3 +27,14 @@ func (c *apiConfig) postsGetHandler(w http.ResponseWriter, r *http.Request, u da
 
 	respondWithJson(w, http.StatusOK, posts)
 }
+
+func getLimit(l string) (int32, error) {
+	if l == "" {
+		return int32(defaultLimitValue), nil
+	}
+	lInt, err := strconv.Atoi(l)
+	if err != nil {
+		return 0, err
+	}
+	return int32(lInt), nil
+} 
