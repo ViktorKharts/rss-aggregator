@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"encoding/xml"
 	"io"
-	"net/http"
-	"time"
 	"log"
-	"context"
+	"net/http"
 	"sync"
+	"time"
 
 	"github.com/ViktorKharts/rss-aggregator/internal/database"
+	"github.com/google/uuid"
 )
 
 type RSSFeed struct {
@@ -65,6 +67,19 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 	}
 	for _, item := range feedData.Channel.Item {
 		log.Println("Found post", item.Title)
+		_, err := db.CreatePost(context.Background(), database.CreatePostParams{
+			ID: uuid.New(),
+			Title: item.Title,
+			Url: item.Link,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid: true,
+			},
+			FeedID: feed.ID,
+		})
+		if err != nil {
+			log.Println("Failed to save post", err)
+		}
 	}
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(feedData.Channel.Item))
 }
@@ -92,4 +107,8 @@ func fetchDataFromFeed(url string) (RSSFeed, error) {
 	}
 
 	return rssFeed, nil  
+}
+
+func savePost() {
+
 }

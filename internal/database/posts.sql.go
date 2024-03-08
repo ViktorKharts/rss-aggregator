@@ -16,7 +16,7 @@ import (
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (
 	id, created_at, updated_at, title, url, description, published_at, feed_id
-) VALUES ($1, NOW(), NOW(), $2, $3, $4, $5, $6)
+) VALUES ($1, NOW(), NOW(), $2, $3, $4, NULL, $5)
 RETURNING id, created_at, updated_at, title, url, description, published_at, feed_id
 `
 
@@ -25,7 +25,6 @@ type CreatePostParams struct {
 	Title       string
 	Url         string
 	Description sql.NullString
-	PublishedAt sql.NullTime
 	FeedID      uuid.UUID
 }
 
@@ -35,7 +34,6 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		arg.Title,
 		arg.Url,
 		arg.Description,
-		arg.PublishedAt,
 		arg.FeedID,
 	)
 	var i Post
